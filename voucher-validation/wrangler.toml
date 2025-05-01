@@ -12,9 +12,10 @@ BACKEND_URL = "https://shop-test-api.requestlab.net/validate-voucher"
 pattern = "shop-test-api.requestlab.net/validate-voucher"
 zone_name = "requestlab.net"
 
-# Add your production environment variables here
-# [env.production.vars]
-# TURNSTILE_SECRET_KEY = "your-secret-key-here"
+
+[observability]
+enabled = true
+head_sampling_rate = 1 # optional. default = 1.
 
 # Add your development environment variables here
 [dev]
