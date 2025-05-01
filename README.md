@@ -67,6 +67,7 @@ This system uses a Cloudflare Worker to handle cross-domain requests and validat
 - Secure architecture with separation of concerns
 - Docker containerization for easy deployment
 - Automatic restart after server reboots
+- Comprehensive logging across all components
 
 ## Security
 
@@ -106,6 +107,43 @@ The following environment variables are used:
 | TURNSTILE_SECRET_KEY | Cloudflare Turnstile secret key | Yes |
 | FRONTEND_URL | URL of the frontend application | Yes |
 | BACKEND_URL | URL of the backend API | Yes |
+
+## Monitoring and Logging
+
+This system features comprehensive logging across all components for easy monitoring and debugging:
+
+### Frontend Console Logs
+- Turnstile widget initialization status
+- Validation process steps
+- API communication results
+
+### Cloudflare Worker Logs
+You can monitor the Cloudflare Worker's activity using:
+```bash
+cd voucher-validation
+wrangler tail
+```
+
+This will show detailed logs for each request, including:
+- Unique request IDs for tracing
+- Turnstile validation results
+- Backend communication details
+- Voucher validation status
+
+### Backend API Logs
+The backend server logs all requests with:
+- Unique request IDs (correlated with worker logs)
+- Timestamp and request details
+- Privacy-focused data masking
+- Voucher validation outcomes
+- Response details and status codes
+
+These logs can be viewed in your Docker container logs:
+```bash
+docker logs [container_name]
+```
+
+With this comprehensive logging system, you can easily track requests from the frontend through the worker to the backend and diagnose any issues that arise.
 
 ## Docker Setup (Recommended)
 
