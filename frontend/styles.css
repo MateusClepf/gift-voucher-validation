@@ -190,4 +190,30 @@ button:disabled {
 .project-info a:hover {
     color: #2980b9;
     text-decoration: underline;
+}
+
+/* API URL styling */
+.api-url {
+    display: block;
+    margin: 0.5rem 0;
+    padding: 0.7rem 1rem;
+    background-color: #f8f9fa;
+    border-left: 4px solid #3498db;
+    font-family: monospace;
+    font-size: 0.9rem;
+    color: #333;
+    word-break: break-all;
+    border-radius: 0 4px 4px 0;
+}
+
+/* Note styling */
+.note {
+    font-size: 0.9rem;
+    padding: 0.7rem 1rem;
+    background-color: #fff8e6;
+    border-left: 4px solid #f0c674;
+    margin-bottom: 1.5rem;
+    line-height: 1.4;
+    color: #5a5a5a;
+    border-radius: 0 4px 4px 0;
 } 

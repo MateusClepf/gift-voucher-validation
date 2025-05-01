@@ -226,4 +226,32 @@ document.addEventListener('DOMContentLoaded', () => {
         // Add tooltip
         codeElement.title = 'Click to use this code';
     });
+    
+    // Add click handler for API URL to copy to clipboard
+    const apiUrlElement = document.querySelector('.api-url');
+    if (apiUrlElement) {
+        apiUrlElement.style.cursor = 'pointer';
+        apiUrlElement.title = 'Click to copy API URL';
+        
+        apiUrlElement.addEventListener('click', function() {
+            const url = this.textContent;
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(url).then(() => {
+                // Show feedback
+                const originalText = this.textContent;
+                const originalBackground = this.style.backgroundColor;
+                
+                this.textContent = '✓ Copied to clipboard!';
+                this.style.backgroundColor = '#d4edda';
+                
+                setTimeout(() => {
+                    this.textContent = originalText;
+                    this.style.backgroundColor = originalBackground;
+                }, 1500);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        });
+    }
 }); 

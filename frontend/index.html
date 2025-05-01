@@ -44,6 +44,16 @@
             <h2>About This Project</h2>
             <p>This is a demo of a secure voucher validation system with Cloudflare Turnstile protection.</p>
             
+            <h3>API Endpoints</h3>
+            <p>
+                <strong>Backend API URL:</strong> 
+                <code class="api-url">https://shop-test-api.requestlab.net/validate-voucher</code>
+            </p>
+            <p class="note">
+                Note: The frontend sends requests to this API URL, but they are intercepted by 
+                a Cloudflare Worker that validates the Turnstile token before forwarding to the backend.
+            </p>
+            
             <h3>Project Structure</h3>
             <ul>
                 <li><strong>Frontend:</strong> HTML, CSS, and JavaScript (this page)</li>
@@ -53,8 +63,8 @@
             
             <h3>GitHub Repository</h3>
             <p>
-                <a href="https://github.com/mateusfreira/turnstile-cross-domain" target="_blank">
-                    github.com/mateusfreira/turnstile-cross-domain
+                <a href="https://github.com/mateusclepf/gift-voucher-validation" target="_blank">
+                    github.com/mateusclepf/gift-voucher-validation
                 </a>
             </p>
         </div>
