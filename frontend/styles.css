@@ -30,12 +30,12 @@ h1 {
 
 .voucher-form {
     display: flex;
-    gap: 0.5rem;
+    flex-direction: column;
+    gap: 1rem;
     margin-bottom: 1.5rem;
 }
 
 input {
-    flex: 1;
     padding: 0.8rem 1rem;
     border: 1px solid #ddd;
     border-radius: 4px;
@@ -57,6 +57,36 @@ button:hover {
     background-color: #3e8e41;
 }
 
+button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+#validation-section {
+    margin: 1rem 0;
+    padding: 1rem;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    background-color: #fafafa;
+}
+
+#turnstile-container {
+    display: flex;
+    justify-content: center;
+    min-height: 70px;
+    width: 100%;
+}
+
+#loading {
+    text-align: center;
+    margin: 1rem 0;
+    color: #666;
+}
+
+.hidden {
+    display: none !important;
+}
+
 .result-hidden {
     display: none;
 }
@@ -65,6 +95,7 @@ button:hover {
     padding: 1rem;
     border-radius: 4px;
     text-align: center;
+    margin-top: 1rem;
 }
 
 .success {

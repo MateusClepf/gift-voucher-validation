@@ -24,6 +24,7 @@ services:
       - voucher-network
     environment:
       - PORT=3003
+      - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY}
 
 networks:
   voucher-network:

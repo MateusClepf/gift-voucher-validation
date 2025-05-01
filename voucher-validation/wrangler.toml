@@ -1,0 +1,21 @@
+name = "voucher-validation"
+main = "src/index.js"
+compatibility_date = "2023-05-18"
+
+[vars]
+FRONTEND_URL = "https://shop-test.whereismypacket.net"
+BACKEND_URL = "https://shop-test-api.requestlab.net/validate-voucher"
+
+# Route configuration to intercept requests to the backend
+# This allows the worker to act as middleware for the backend API
+[[routes]]
+pattern = "shop-test-api.requestlab.net/validate-voucher"
+zone_name = "requestlab.net"
+
+# Add your production environment variables here
+# [env.production.vars]
+# TURNSTILE_SECRET_KEY = "your-secret-key-here"
+
+# Add your development environment variables here
+[dev]
+port = 8787 

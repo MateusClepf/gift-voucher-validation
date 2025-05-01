@@ -18,15 +18,19 @@ const validVouchers = [
 ];
 
 // API endpoint to validate vouchers
-app.post('/validate-voucher', (req, res) => {
+app.post('/validate-voucher', async (req, res) => {
   const { code } = req.body;
   
+  // Check if voucher code is provided
   if (!code) {
     return res.status(400).json({ 
       valid: false, 
       message: 'Voucher code is required' 
     });
   }
+  
+  // Note: Turnstile validation is now handled by the Cloudflare Worker
+  // We can directly proceed with voucher validation
   
   // Find the voucher in our list of valid vouchers
   const voucher = validVouchers.find(v => v.code === code.toUpperCase());
