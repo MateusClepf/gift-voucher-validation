@@ -1,12 +1,14 @@
 name = "voucher-validation"
 main = "src/index.js"
-compatibility_date = "2023-05-18"
+compatibility_date = "202-05-01"
 
 # Route configuration to intercept requests to the backend
 # This allows the worker to act as middleware for the backend API
 
 
-route = { pattern = "shop-test-api.requestlab.net/validate-voucher", zone_name = "requestlab.net" }
+routes = [
+    { pattern = "shop-test-api.requestlab.net/validate-voucher", zone_name = "requestlab.net" }
+]
 
 [vars]
 FRONTEND_URL = "https://shop-test.whereismypacket.net"
