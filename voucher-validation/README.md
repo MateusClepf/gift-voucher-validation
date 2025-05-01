@@ -9,6 +9,7 @@ A Cloudflare Worker that validates Cloudflare Turnstile tokens before forwarding
 - Forwards valid requests to the backend API
 - Returns appropriate error responses for invalid requests
 - Handles CORS for cross-domain requests
+- Properly responds to OPTIONS preflight requests for CORS compatibility
 
 ## Setup
 
@@ -106,6 +107,18 @@ Example request:
 ```
 
 If validation is successful, the request is forwarded to the backend API. If validation fails, an appropriate error response is returned.
+
+### CORS Support
+
+The worker includes proper CORS support:
+
+1. Handles OPTIONS preflight requests with appropriate headers
+2. Includes CORS headers in all responses
+3. Specifies allowed methods (GET, POST, OPTIONS)
+4. Specifies allowed headers (Content-Type, cf-turnstile-response)
+5. Sets the Access-Control-Allow-Origin header based on the FRONTEND_URL environment variable
+
+This ensures smooth cross-domain communication when the frontend and worker are on different domains.
 
 ## Integration with Frontend
 

@@ -43,6 +43,23 @@ The data flow is:
 5. Backend API validates the voucher code and returns the result
 6. Worker returns the API response to the Frontend
 
+### Cross-Domain Implementation
+
+This system uses a Cloudflare Worker to handle cross-domain requests and validate Turnstile tokens:
+
+1. **Worker Route Interception**: The worker is configured to intercept requests to the backend API URL
+   ```toml
+   [[routes]]
+   pattern = "shop-test-api.requestlab.net/validate-voucher"
+   zone_name = "requestlab.net"
+   ```
+
+2. **CORS Handling**: The worker properly handles CORS preflight requests (OPTIONS) and includes appropriate CORS headers in all responses, ensuring smooth cross-domain communication.
+
+3. **Transparent Proxying**: The frontend can continue using the original backend URL (`https://shop-test-api.requestlab.net/validate-voucher`) while the worker intercepts these requests, validates the Turnstile tokens, and forwards them to the backend.
+
+4. **Security Validation**: The worker verifies that tokens were issued for the expected hostname, adding an additional layer of security.
+
 ## Features
 
 - Simple and clean user interface
@@ -61,6 +78,17 @@ This application uses Cloudflare Turnstile for bot protection with the following
 4. The Worker validates the token with Cloudflare's verification API
 5. If the token is valid, the Worker forwards the request to the backend
 6. The Backend processes the voucher code without needing to re-validate the token
+
+### Cloudflare Worker Components
+
+The Cloudflare Worker consists of several key components:
+
+1. **Request Handler**: Processes incoming requests, handling OPTIONS preflight requests for CORS and validating POST requests
+2. **Turnstile Validator**: Verifies Turnstile tokens against Cloudflare's validation API
+3. **Backend Proxy**: Forwards valid requests to the backend API and returns responses
+4. **CORS Handler**: Ensures proper cross-domain communication by setting appropriate headers
+
+The worker is designed to be minimalist and efficient, with a focus on security and reliability.
 
 ### Environment Variables
 

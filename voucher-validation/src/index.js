@@ -17,9 +17,17 @@ const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/sit
  */
 export default {
   async fetch(request, env, ctx) {
+    // Handle CORS preflight requests (OPTIONS)
+    if (request.method === 'OPTIONS') {
+      return handleCorsPreflightRequest(env);
+    }
+    
     // Only allow POST requests
     if (request.method !== 'POST') {
-      return new Response('Method not allowed', { status: 405 });
+      return new Response('Method not allowed', { 
+        status: 405,
+        headers: getCorsHeaders(env)
+      });
     }
 
     // Get the client IP
@@ -30,7 +38,10 @@ export default {
     try {
       requestBody = await request.json();
     } catch (error) {
-      return new Response('Invalid JSON body', { status: 400 });
+      return new Response('Invalid JSON body', { 
+        status: 400,
+        headers: getCorsHeaders(env)
+      });
     }
 
     // Extract the Turnstile token
@@ -41,7 +52,7 @@ export default {
         message: 'Security validation token is required'
       }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' }
+        headers: getCorsHeaders(env)
       });
     }
 
@@ -56,7 +67,7 @@ export default {
         turnstileError: turnstileResult['error-codes']
       }), {
         status: 403,
-        headers: { 'Content-Type': 'application/json' }
+        headers: getCorsHeaders(env)
       });
     }
 
@@ -69,7 +80,7 @@ export default {
           message: 'Security validation failed: invalid hostname',
         }), {
           status: 403,
-          headers: { 'Content-Type': 'application/json' }
+          headers: getCorsHeaders(env)
         });
       }
     }
@@ -77,6 +88,35 @@ export default {
     // Token is valid, forward the request to the backend
     return await forwardRequestToBackend(requestBody, env);
   }
+}
+
+/**
+ * Handles CORS preflight requests
+ * @param {Object} env - Environment variables
+ * @returns {Response} - Response for preflight request
+ */
+function handleCorsPreflightRequest(env) {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      ...getCorsHeaders(env),
+      'Access-Control-Max-Age': '86400', // Cache preflight response for 24 hours
+    }
+  });
+}
+
+/**
+ * Returns CORS headers for responses
+ * @param {Object} env - Environment variables
+ * @returns {Object} - CORS headers
+ */
+function getCorsHeaders(env) {
+  return {
+    'Access-Control-Allow-Origin': env.FRONTEND_URL || '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, cf-turnstile-response',
+    'Content-Type': 'application/json'
+  };
 }
 
 /**
@@ -131,15 +171,10 @@ async function forwardRequestToBackend(requestBody, env) {
     // Get the backend response
     const backendResponseData = await backendResponse.json();
 
-    // Return the backend response
+    // Return the backend response with proper CORS headers
     return new Response(JSON.stringify(backendResponseData), {
       status: backendResponse.status,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': env.FRONTEND_URL,
-        'Access-Control-Allow-Methods': 'POST',
-        'Access-Control-Allow-Headers': 'Content-Type'
-      }
+      headers: getCorsHeaders(env)
     });
   } catch (error) {
     console.error('Backend request error:', error);
@@ -148,7 +183,7 @@ async function forwardRequestToBackend(requestBody, env) {
       message: 'Error connecting to validation service'
     }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: getCorsHeaders(env)
     });
   }
 } 
