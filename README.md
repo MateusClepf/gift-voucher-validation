@@ -36,7 +36,7 @@ docker-compose up -d
 The containers are configured with `restart: always` policy to automatically restart after server reboots.
 
 The services will be available at:
-- Frontend: http://localhost:80
+- Frontend: http://localhost:8081
 - Backend API: http://localhost:3003
 
 For production deployment:
@@ -75,11 +75,11 @@ For development, you can use a simple HTTP server:
 ```bash
 # Using Python (if installed)
 cd frontend
-python -m http.server 8080
+python -m http.server 8081
 
 # Or with Node.js (if installed)
 cd frontend
-npx http-server -p 8080
+npx http-server -p 8081
 ```
 
 ## Valid Vouchers

@@ -8,7 +8,7 @@ docker-compose build --no-cache
 docker-compose up -d
 
 echo "Deployment complete!"
-echo "Frontend available at: http://localhost"
+echo "Frontend available at: http://localhost:8081"
 echo "Backend API available at: http://localhost:3003"
 echo "Containers configured to restart automatically after server reboot."
 echo ""
