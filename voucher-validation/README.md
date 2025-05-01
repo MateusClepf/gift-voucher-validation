@@ -10,7 +10,6 @@ A Cloudflare Worker that validates Cloudflare Turnstile tokens before forwarding
 - Returns appropriate error responses for invalid requests
 - Handles CORS for cross-domain requests
 - Properly responds to OPTIONS preflight requests for CORS compatibility
-- Comprehensive request and validation logging
 
 ## Setup
 
@@ -120,33 +119,6 @@ The worker includes proper CORS support:
 5. Sets the Access-Control-Allow-Origin header based on the FRONTEND_URL environment variable
 
 This ensures smooth cross-domain communication when the frontend and worker are on different domains.
-
-### Logging
-
-The worker includes detailed logging for monitoring and debugging:
-
-1. **Request Logging**: Each request receives a unique ID and timestamp, with key details logged:
-   - HTTP method and URL
-   - Client IP address and User-Agent
-   - Partially masked voucher code (for privacy)
-   - Turnstile token length
-
-2. **Validation Logging**:
-   - Turnstile API responses and validation status
-   - Token details including hostname validation
-   - Error messages for failed validations
-
-3. **Backend Communication**:
-   - Request forwarding details
-   - Response timing and status codes
-   - Voucher validation results
-
-To view these logs, use the Cloudflare dashboard or run:
-```bash
-wrangler tail
-```
-
-This provides a real-time view of all worker activity, making it easier to troubleshoot issues.
 
 ## Integration with Frontend
 

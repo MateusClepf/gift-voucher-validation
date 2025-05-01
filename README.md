@@ -88,7 +88,6 @@ The Cloudflare Worker consists of several key components:
 2. **Turnstile Validator**: Verifies Turnstile tokens against Cloudflare's validation API
 3. **Backend Proxy**: Forwards valid requests to the backend API and returns responses
 4. **CORS Handler**: Ensures proper cross-domain communication by setting appropriate headers
-5. **Logging System**: Provides detailed logging of requests, validations, and responses for monitoring and debugging
 
 The worker is designed to be minimalist and efficient, with a focus on security and reliability.
 
@@ -110,29 +109,16 @@ The following environment variables are used:
 
 ## Monitoring and Logging
 
-This system features comprehensive logging across all components for easy monitoring and debugging:
+This system features logging capabilities for monitoring and debugging:
 
 ### Frontend Console Logs
 - Turnstile widget initialization status
 - Validation process steps
 - API communication results
 
-### Cloudflare Worker Logs
-You can monitor the Cloudflare Worker's activity using:
-```bash
-cd voucher-validation
-wrangler tail
-```
-
-This will show detailed logs for each request, including:
-- Unique request IDs for tracing
-- Turnstile validation results
-- Backend communication details
-- Voucher validation status
-
 ### Backend API Logs
 The backend server logs all requests with:
-- Unique request IDs (correlated with worker logs)
+- Unique request IDs 
 - Timestamp and request details
 - Privacy-focused data masking
 - Voucher validation outcomes
@@ -143,7 +129,7 @@ These logs can be viewed in your Docker container logs:
 docker logs [container_name]
 ```
 
-With this comprehensive logging system, you can easily track requests from the frontend through the worker to the backend and diagnose any issues that arise.
+The backend logging system helps you track API requests, monitor validation patterns, and diagnose any issues that arise.
 
 ## Docker Setup (Recommended)
 
