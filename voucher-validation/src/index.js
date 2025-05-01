@@ -60,7 +60,8 @@ export default {
       });
     }
 
-    // Make sure the token was generated for our expected hostname
+    // This is an optional security check, is is needed if any domain option is enable in the Turnstile widget.
+    // If you are using a single frontend domain, you can remove this check as the Turnstile widget will only generate tokens for the expected hostname.
     if (turnstileResult.hostname && env.FRONTEND_URL) {
       const expectedHostname = new URL(env.FRONTEND_URL).hostname;
       if (turnstileResult.hostname !== expectedHostname) {
