@@ -87,6 +87,7 @@ The Cloudflare Worker consists of several key components:
 2. **Turnstile Validator**: Verifies Turnstile tokens against Cloudflare's validation API
 3. **Backend Proxy**: Forwards valid requests to the backend API and returns responses
 4. **CORS Handler**: Ensures proper cross-domain communication by setting appropriate headers
+5. **Logging System**: Provides detailed logging of requests, validations, and responses for monitoring and debugging
 
 The worker is designed to be minimalist and efficient, with a focus on security and reliability.
 
@@ -139,6 +140,23 @@ npm run deploy
 ```
 
 Make sure to set the required environment variables in the Cloudflare dashboard.
+
+### Monitoring Worker Logs
+
+You can monitor the Cloudflare Worker's activity using:
+
+```bash
+cd voucher-validation
+wrangler tail
+```
+
+This will show detailed logs for each request, including:
+- Unique request IDs for tracing
+- Turnstile validation results
+- Backend communication details
+- Voucher validation status
+
+These logs are invaluable for debugging and monitoring the application in production.
 
 ## Manual Setup
 
