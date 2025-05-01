@@ -54,9 +54,11 @@ This system uses a Cloudflare Worker to handle cross-domain validation and proxy
    zone_name = "requestlab.net"
    ```
 
-2. **Transparent Proxying**: The frontend can continue using the original backend URL (`https://shop-test-api.requestlab.net/validate-voucher`) while the worker intercepts these requests, validates the Turnstile tokens, and forwards them to the backend.
+2. **CORS Support**: The worker handles cross-domain requests by supporting preflight OPTIONS requests and dynamically setting CORS headers based on the request's origin.
 
-3. **Security Validation**: The worker verifies that tokens were issued for the expected hostname, adding an additional layer of security.
+3. **Transparent Proxying**: The frontend can continue using the original backend URL (`https://shop-test-api.requestlab.net/validate-voucher`) while the worker intercepts these requests, validates the Turnstile tokens, and forwards them to the backend.
+
+4. **Security Validation**: The worker verifies that tokens were issued for the expected hostname, adding an additional layer of security.
 
 ## Features
 
@@ -82,9 +84,10 @@ This application uses Cloudflare Turnstile for bot protection with the following
 
 The Cloudflare Worker consists of several key components:
 
-1. **Request Handler**: Processes incoming requests and validates POST requests
+1. **Request Handler**: Processes incoming requests, handling OPTIONS preflight requests for CORS and validating POST requests
 2. **Turnstile Validator**: Verifies Turnstile tokens against Cloudflare's validation API
 3. **Backend Proxy**: Forwards valid requests to the backend API and returns responses, stripping Turnstile tokens for cleaner requests
+4. **CORS Handler**: Ensures proper cross-domain communication by setting appropriate headers based on request origin
 
 The worker is designed to be minimalist and efficient, with a focus on security and reliability.
 

@@ -11,6 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // The Cloudflare Worker will intercept these requests
     const API_URL = 'https://shop-test-api.requestlab.net/validate-voucher';
     
+    // Frontend URL for CORS origin header
+    const FRONTEND_URL = window.location.origin;
+    
     // Turnstile site key
     const TURNSTILE_SITE_KEY = '0x4AAAAAABYLuI3gJkDWzm0a';
     
@@ -20,6 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Ensure all elements are initially in the correct state
     validationSection.classList.add('hidden');
     loadingDiv.classList.add('hidden');
+    
+    // Log the frontend URL for debugging
+    console.log('Frontend URL:', FRONTEND_URL);
     
     // Check if Turnstile is ready
     const isTurnstileReady = () => {
@@ -145,21 +151,28 @@ document.addEventListener('DOMContentLoaded', () => {
     function submitVoucherValidation(voucherCode, token) {
         console.log('Submitting validation request');
         
-        // Convert the token to URL parameters to avoid triggering a preflight request
-        // This approach uses application/x-www-form-urlencoded format instead of JSON
-        const formData = new URLSearchParams();
-        formData.append('code', voucherCode);
-        formData.append('cf-turnstile-response', token);
-        
-        // Call API using POST with form encoding (won't trigger preflight)
+        // Call API with both voucher code and turnstile token
+        // The Cloudflare Worker will intercept this request
         fetch(API_URL, {
             method: 'POST',
+            mode: 'cors', // Enable CORS mode
+            credentials: 'same-origin',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'application/json',
+                'Origin': FRONTEND_URL, // Add origin header for CORS
+                'X-Requested-With': 'XMLHttpRequest'
             },
-            body: formData
+            body: JSON.stringify({ 
+                code: voucherCode,
+                'cf-turnstile-response': token
+            })
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.valid) {
                 showResult(`Voucher valid! Value: ${data.value}`, true);
@@ -170,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         })
         .catch(error => {
-            showResult('Error connecting to server. Please try again.', false);
+            showResult(`Error connecting to server: ${error.message}. Please try again.`, false);
             console.error('Error:', error);
         })
         .finally(() => {

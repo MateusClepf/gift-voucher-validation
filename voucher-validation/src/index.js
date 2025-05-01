@@ -17,47 +17,31 @@ const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/sit
  */
 export default {
   async fetch(request, env, ctx) {
+    // Handle CORS preflight requests (OPTIONS)
+    if (request.method === 'OPTIONS') {
+      return handleCorsPreflightRequest(request, env);
+    }
+    
     // Only allow POST requests
     if (request.method !== 'POST') {
-      return new Response('Method not allowed', { status: 405 });
+      return new Response('Method not allowed', { 
+        status: 405,
+        headers: getCorsHeaders(request, env)
+      });
     }
 
     // Get the client IP
     const clientIP = request.headers.get('CF-Connecting-IP');
     
-    // Parse the request body based on content type
-    let requestBody = {};
-    const contentType = request.headers.get('Content-Type') || '';
-    
+    // Parse the request body
+    let requestBody;
     try {
-      if (contentType.includes('application/json')) {
-        // Handle JSON data
-        requestBody = await request.json();
-      } else if (contentType.includes('application/x-www-form-urlencoded')) {
-        // Handle form data
-        const formData = await request.formData();
-        // Convert FormData to a regular object
-        for (const pair of formData.entries()) {
-          requestBody[pair[0]] = pair[1];
-        }
-      } else {
-        // Try to parse as form data first, then fall back to text if that fails
-        try {
-          const formData = await request.formData();
-          for (const pair of formData.entries()) {
-            requestBody[pair[0]] = pair[1];
-          }
-        } catch (formError) {
-          // Fall back to parsing URL params from body text
-          const bodyText = await request.text();
-          const params = new URLSearchParams(bodyText);
-          for (const [key, value] of params.entries()) {
-            requestBody[key] = value;
-          }
-        }
-      }
+      requestBody = await request.json();
     } catch (error) {
-      return new Response('Invalid request body', { status: 400 });
+      return new Response('Invalid JSON body', { 
+        status: 400,
+        headers: getCorsHeaders(request, env)
+      });
     }
 
     // Extract the Turnstile token
@@ -68,7 +52,7 @@ export default {
         message: 'Security validation token is required'
       }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' }
+        headers: getCorsHeaders(request, env)
       });
     }
 
@@ -83,7 +67,7 @@ export default {
         turnstileError: turnstileResult['error-codes']
       }), {
         status: 403,
-        headers: { 'Content-Type': 'application/json' }
+        headers: getCorsHeaders(request, env)
       });
     }
 
@@ -97,14 +81,49 @@ export default {
           message: 'Security validation failed: invalid hostname',
         }), {
           status: 403,
-          headers: { 'Content-Type': 'application/json' }
+          headers: getCorsHeaders(request, env)
         });
       }
     }
 
     // Token is valid, forward the request to the backend
-    return await forwardRequestToBackend(requestBody, env);
+    return await forwardRequestToBackend(requestBody, request, env);
   }
+}
+
+/**
+ * Handles CORS preflight requests
+ * @param {Request} request - The original request
+ * @param {Object} env - Environment variables
+ * @returns {Response} - Response for preflight request
+ */
+function handleCorsPreflightRequest(request, env) {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      ...getCorsHeaders(request, env),
+      'Access-Control-Max-Age': '86400', // Cache preflight response for 24 hours
+    }
+  });
+}
+
+/**
+ * Returns CORS headers for responses
+ * @param {Request} request - The original request
+ * @param {Object} env - Environment variables
+ * @returns {Object} - CORS headers
+ */
+function getCorsHeaders(request, env) {
+  // Get the origin from the request
+  const origin = request.headers.get('Origin') || env.FRONTEND_URL || '*';
+  
+  return {
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, cf-turnstile-response, Origin, X-Requested-With',
+    'Content-Type': 'application/json',
+    'Vary': 'Origin' // Important for caching responses with different origins
+  };
 }
 
 /**
@@ -142,10 +161,11 @@ async function validateTurnstileToken(token, remoteip, env) {
 /**
  * Forwards the request to the backend after validation
  * @param {Object} requestBody - The validated request body
+ * @param {Request} request - The original request
  * @param {Object} env - Environment variables containing the backend URL
  * @returns {Promise<Response>} - The backend response
  */
-async function forwardRequestToBackend(requestBody, env) {
+async function forwardRequestToBackend(requestBody, request, env) {
   try {
     // Create a clean copy of the request body without the Turnstile token
     const cleanRequestBody = { ...requestBody };
@@ -153,7 +173,7 @@ async function forwardRequestToBackend(requestBody, env) {
     // Remove the Turnstile token before forwarding to the backend
     delete cleanRequestBody['cf-turnstile-response'];
     
-    // Forward the request to the backend as JSON (the backend expects JSON)
+    // Forward the request to the backend
     const backendResponse = await fetch(env.BACKEND_URL, {
       method: 'POST',
       headers: {
@@ -168,7 +188,7 @@ async function forwardRequestToBackend(requestBody, env) {
     // Return the backend response
     return new Response(JSON.stringify(backendResponseData), {
       status: backendResponse.status,
-      headers: { 'Content-Type': 'application/json' }
+      headers: getCorsHeaders(request, env)
     });
   } catch (error) {
     console.error('Backend request error:', error);
@@ -177,7 +197,7 @@ async function forwardRequestToBackend(requestBody, env) {
       message: 'Error connecting to validation service'
     }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: getCorsHeaders(request, env)
     });
   }
 } 
