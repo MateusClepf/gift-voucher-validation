@@ -145,17 +145,19 @@ document.addEventListener('DOMContentLoaded', () => {
     function submitVoucherValidation(voucherCode, token) {
         console.log('Submitting validation request');
         
-        // Call API with both voucher code and turnstile token
-        // The Cloudflare Worker will intercept this request
+        // Convert the token to URL parameters to avoid triggering a preflight request
+        // This approach uses application/x-www-form-urlencoded format instead of JSON
+        const formData = new URLSearchParams();
+        formData.append('code', voucherCode);
+        formData.append('cf-turnstile-response', token);
+        
+        // Call API using POST with form encoding (won't trigger preflight)
         fetch(API_URL, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: JSON.stringify({ 
-                code: voucherCode,
-                'cf-turnstile-response': token
-            })
+            body: formData
         })
         .then(response => response.json())
         .then(data => {

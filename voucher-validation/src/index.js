@@ -25,12 +25,39 @@ export default {
     // Get the client IP
     const clientIP = request.headers.get('CF-Connecting-IP');
     
-    // Parse the request body
-    let requestBody;
+    // Parse the request body based on content type
+    let requestBody = {};
+    const contentType = request.headers.get('Content-Type') || '';
+    
     try {
-      requestBody = await request.json();
+      if (contentType.includes('application/json')) {
+        // Handle JSON data
+        requestBody = await request.json();
+      } else if (contentType.includes('application/x-www-form-urlencoded')) {
+        // Handle form data
+        const formData = await request.formData();
+        // Convert FormData to a regular object
+        for (const pair of formData.entries()) {
+          requestBody[pair[0]] = pair[1];
+        }
+      } else {
+        // Try to parse as form data first, then fall back to text if that fails
+        try {
+          const formData = await request.formData();
+          for (const pair of formData.entries()) {
+            requestBody[pair[0]] = pair[1];
+          }
+        } catch (formError) {
+          // Fall back to parsing URL params from body text
+          const bodyText = await request.text();
+          const params = new URLSearchParams(bodyText);
+          for (const [key, value] of params.entries()) {
+            requestBody[key] = value;
+          }
+        }
+      }
     } catch (error) {
-      return new Response('Invalid JSON body', { status: 400 });
+      return new Response('Invalid request body', { status: 400 });
     }
 
     // Extract the Turnstile token
@@ -126,7 +153,7 @@ async function forwardRequestToBackend(requestBody, env) {
     // Remove the Turnstile token before forwarding to the backend
     delete cleanRequestBody['cf-turnstile-response'];
     
-    // Forward the request to the backend
+    // Forward the request to the backend as JSON (the backend expects JSON)
     const backendResponse = await fetch(env.BACKEND_URL, {
       method: 'POST',
       headers: {
