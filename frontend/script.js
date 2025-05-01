@@ -203,4 +203,27 @@ document.addEventListener('DOMContentLoaded', () => {
         resultDiv.className = 'result-hidden';
         resultDiv.style.display = 'none';
     }
+    
+    // Add click handlers for test voucher codes
+    document.querySelectorAll('.test-vouchers code').forEach(codeElement => {
+        codeElement.addEventListener('click', function() {
+            const code = this.textContent;
+            voucherInput.value = code;
+            
+            // Add a visual feedback for the click
+            const originalBackground = this.style.backgroundColor;
+            this.style.backgroundColor = '#d4edda';
+            this.style.transition = 'background-color 0.3s';
+            
+            setTimeout(() => {
+                this.style.backgroundColor = originalBackground;
+            }, 500);
+        });
+        
+        // Change cursor to indicate clickable
+        codeElement.style.cursor = 'pointer';
+        
+        // Add tooltip
+        codeElement.title = 'Click to use this code';
+    });
 }); 

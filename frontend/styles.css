@@ -28,6 +28,13 @@ h1 {
     margin-bottom: 1.5rem;
 }
 
+h2 {
+    font-size: 1.3rem;
+    color: #444;
+    margin-top: 2rem;
+    margin-bottom: 0.8rem;
+}
+
 .voucher-form {
     display: flex;
     flex-direction: column;
@@ -108,4 +115,35 @@ button:disabled {
     background-color: #ffebee;
     color: #c62828;
     border: 1px solid #ffcdd2;
+}
+
+/* Test vouchers section styling */
+.test-vouchers {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+}
+
+.test-vouchers p {
+    color: #666;
+    margin-bottom: 0.8rem;
+}
+
+.test-vouchers ul {
+    list-style-position: inside;
+    margin-left: 0.5rem;
+}
+
+.test-vouchers li {
+    margin-bottom: 0.5rem;
+    color: #555;
+}
+
+.test-vouchers code {
+    background-color: #f5f5f5;
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    font-family: monospace;
+    font-weight: bold;
+    color: #333;
 } 
