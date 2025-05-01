@@ -1,6 +1,6 @@
 name = "voucher-validation"
 main = "src/index.js"
-compatibility_date = "202-05-01"
+compatibility_date = "2025-05-01"
 
 # Route configuration to intercept requests to the backend
 # This allows the worker to act as middleware for the backend API
