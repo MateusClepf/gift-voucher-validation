@@ -10,6 +10,7 @@ A Cloudflare Worker that validates Cloudflare Turnstile tokens before forwarding
 - Returns appropriate error responses for invalid requests
 - Handles CORS for cross-domain requests
 - Properly responds to OPTIONS preflight requests for CORS compatibility
+- Strips Turnstile tokens before forwarding to backend for cleaner requests
 
 ## Setup
 
@@ -106,7 +107,7 @@ Example request:
 }
 ```
 
-If validation is successful, the request is forwarded to the backend API. If validation fails, an appropriate error response is returned.
+If validation is successful, the request is forwarded to the backend API with the Turnstile token removed, resulting in a cleaner request payload. If validation fails, an appropriate error response is returned.
 
 ### CORS Support
 

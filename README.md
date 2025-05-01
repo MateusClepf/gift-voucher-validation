@@ -39,7 +39,7 @@ The data flow is:
 1. User enters a voucher code and completes the Turnstile challenge
 2. Frontend sends voucher code and Turnstile token to the Cloudflare Worker
 3. Worker validates the Turnstile token to ensure the request is from a legitimate user
-4. If valid, the Worker forwards the request to the Backend API
+4. If valid, the Worker removes the Turnstile token and forwards the clean request to the Backend API
 5. Backend API validates the voucher code and returns the result
 6. Worker returns the API response to the Frontend
 
@@ -86,7 +86,7 @@ The Cloudflare Worker consists of several key components:
 
 1. **Request Handler**: Processes incoming requests, handling OPTIONS preflight requests for CORS and validating POST requests
 2. **Turnstile Validator**: Verifies Turnstile tokens against Cloudflare's validation API
-3. **Backend Proxy**: Forwards valid requests to the backend API and returns responses
+3. **Backend Proxy**: Forwards valid requests to the backend API and returns responses, stripping Turnstile tokens for cleaner requests
 4. **CORS Handler**: Ensures proper cross-domain communication by setting appropriate headers
 
 The worker is designed to be minimalist and efficient, with a focus on security and reliability.

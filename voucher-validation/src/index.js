@@ -31,7 +31,7 @@ export default {
     }
 
     // Get the client IP
-    const clientIP = request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For');
+    const clientIP = request.headers.get('CF-Connecting-IP');
     
     // Parse the request body
     let requestBody;
@@ -159,13 +159,19 @@ async function validateTurnstileToken(token, remoteip, env) {
  */
 async function forwardRequestToBackend(requestBody, env) {
   try {
+    // Create a clean copy of the request body without the Turnstile token
+    const cleanRequestBody = { ...requestBody };
+    
+    // Remove the Turnstile token before forwarding to the backend
+    delete cleanRequestBody['cf-turnstile-response'];
+    
     // Forward the request to the backend
     const backendResponse = await fetch(env.BACKEND_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify(cleanRequestBody)
     });
 
     // Get the backend response
